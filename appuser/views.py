@@ -1,22 +1,22 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import generics
 from django.contrib.auth import get_user_model
-
 from .serializers import AppUserSerialzier
 
 
 User = get_user_model()
 
 
-@api_view(['GET', 'POST'])
-def user_list(request):
-    if request.method == 'GET':
-        users = User.objects.all()
-        serializer = AppUserSerialzier(users, many=True)
-        return Response(serializer.data)
-    if request.method == 'POST':
-        serializer = AppUserSerialzier(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+class UserList(generics.ListCreateAPIView):
+    """
+    Get all users or create new user
+    """
+    queryset = User.objects.all()
+    serializer_class = AppUserSerialzier
 
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Get a user, update it or delete it
+    """
+    queryset = User.objects.all()
+    serializer_class = AppUserSerialzier
